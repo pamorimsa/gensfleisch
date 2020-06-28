@@ -16,6 +16,7 @@ if not os.getenv("DATABASE_URL"):
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
+
 def list_authors():
     """Extract and sort all unique authors from file."""
     with open("books.csv") as f:
@@ -37,16 +38,21 @@ def list_authors():
 
 
 def create_authors():
+    """Create authors table and insert rows."""
     authors = list_authors()
     count = 1
     total = len(authors)
+
+    # Create table
     db.execute("CREATE TABLE authors (\
                 author_id SERIAL PRIMARY KEY,\
                 author VARCHAR NOT NULL\
                 )")
+
+    # Insert rows
     for author_id in authors:
         db.execute("INSERT INTO authors VALUES (:author_id, :author)",
-                    {"author_id": author_id, "author": authors[author_id]})
+                   {"author_id": author_id, "author": authors[author_id]})
         total = len(authors)
         print(f"Added {count}/{total}")
         count += 1
@@ -55,7 +61,10 @@ def create_authors():
 
 
 def create_books():
+    """Create books table and insert rows."""
     authors = list_authors()
+
+    # Create table
     db.execute("CREATE TABLE books (\
                 book_id SERIAL PRIMARY KEY,\
                 isbn VARCHAR NOT NULL,\
@@ -63,6 +72,8 @@ def create_books():
                 author INTEGER REFERENCES authors,\
                 year INTEGER NOT NULL\
                 )")
+
+    # Insert rows
     with open("books.csv") as f:
         data_list = list(csv.reader(f))
         book_id = 1
@@ -71,9 +82,9 @@ def create_books():
         for isbn, title, author, year in data_list[1:]:
             author = list(authors.values()).index(author) + 1
             db.execute("INSERT INTO books VALUES (:book_id, :isbn, :title,\
-                                                    :author, :year)",
-                        {"book_id": book_id, "isbn": isbn, "title": title,
-                            "author": author, "year": year})
+                                                  :author, :year)",
+                       {"book_id": book_id, "isbn": isbn, "title": title,
+                        "author": author, "year": year})
 
             print(f"Added book {book_id} ({count}/{total})")
             book_id += 1
@@ -83,8 +94,9 @@ def create_books():
 
 
 def main():
-    #create_authors()
+    create_authors()
     create_books()
+
 
 if __name__ == "__main__":
     main()
