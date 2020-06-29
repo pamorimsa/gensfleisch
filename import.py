@@ -29,7 +29,7 @@ def list_authors():
         authors = set(list(authors))
         authors = sorted(authors)
 
-        # Pre-generate authors table with id as key
+        # Pregenerate authors table with id as key
         authors_table = {}
         for author in authors:
             authors_table[authors.index(author)+1] = author
