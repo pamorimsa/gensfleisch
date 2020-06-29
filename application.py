@@ -33,15 +33,22 @@ def index():
 
 @app.route("/book/<string:isbn>")
 def book(isbn):
+    # Get book info from database
     query = text("SELECT isbn, title, authors.author, year FROM books JOIN \
                  authors ON books.author = authors.author_id WHERE isbn = :isbn")  # noqa: E501
     book = db.execute(query, {"isbn": isbn}).fetchall()
+    title = book[0][1]
+    author = book[0][2]
+
+    # Get average rating from Goodreads
     url = f"https://www.goodreads.com/book/review_counts.json?isbns={isbn}&key=\
             {os.getenv('API_KEY')}"
     res = requests.get(url)
     data = res.json()
     rating = data["books"][0]["average_rating"]
-    return render_template("book.html", book=book, rating=rating)
+
+    return render_template("book.html", isbn=isbn, title=title, author=author,
+                           rating=rating)
 
 
 @app.route("/search", methods=["POST"])
