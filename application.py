@@ -31,8 +31,8 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/book/<string:isbn>")
-def book(isbn):
+@app.route("/books/<string:isbn>")
+def books(isbn):
     # Get book info from database
     query = text("SELECT isbn, title, authors.author, year FROM books JOIN \
                  authors ON books.author = authors.author_id WHERE isbn = :isbn")  # noqa: E501
@@ -47,7 +47,7 @@ def book(isbn):
     data = res.json()
     rating = data["books"][0]["average_rating"]
 
-    return render_template("book.html", isbn=isbn, title=title, author=author,
+    return render_template("books.html", isbn=isbn, title=title, author=author,
                            rating=rating)
 
 

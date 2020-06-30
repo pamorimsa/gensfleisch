@@ -4,7 +4,11 @@
   <div class="container-fluid">
     {% for isbn, title, author, year in books %}
       <div class="card">
-        <h5 class="card-header">{{ title }}</h5>
+        <h5 class="card-header">
+          <a href="{{ url_for('books', isbn=isbn) }}">
+            {{ title }}
+          </a>
+        </h5>
         <div class="card-body">
           <h5 class="card-title">{{ author }}, {{ year }}</h5>
           <p class="card-text">{{ isbn }}</p>
