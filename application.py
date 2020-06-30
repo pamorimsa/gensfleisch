@@ -1,20 +1,24 @@
 import os
-import requests
 
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 from flask_session import Session
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from dotenv import load_dotenv
+
+# Import api request module
+from goodreads_api import retrieve_data
 
 app = Flask(__name__)
 
 # Load dotenv
 load_dotenv('.env')
 
-# Check for environment variable
+# Check for database and api key environment variables
 if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
+elif not os.getenv("API_KEY"):
+    raise RuntimeError("API_KEY is not set")
 
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
@@ -31,7 +35,7 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/books/<string:isbn>")
+@app.route("/books/<isbn>")
 def books(isbn):
     # Get book info from database
     query = text("SELECT isbn, title, authors.author, year FROM books JOIN \
@@ -40,12 +44,14 @@ def books(isbn):
     title = book[0][1]
     author = book[0][2]
 
-    # Get average rating from Goodreads
-    url = f"https://www.goodreads.com/book/review_counts.json?isbns={isbn}&key=\
-            {os.getenv('API_KEY')}"
-    res = requests.get(url)
-    data = res.json()
-    rating = data["books"][0]["average_rating"]
+    # Get data from Goodreads API
+    data = retrieve_data(isbn)
+
+    # Handle status code
+    if data is None:
+        rating = "Unavailable"
+    else:
+        rating = data["books"][0]["average_rating"]
 
     return render_template("books.html", isbn=isbn, title=title, author=author,
                            rating=rating)
@@ -65,3 +71,16 @@ def search():
                  ({search_by}) LIKE :search_for")
     books = db.execute(query, {"search_for": search_for}).fetchall()
     return render_template("search.html", books=books)
+
+
+@app.route("/api/<isbn>", methods=["GET"])
+def api(isbn):
+    query = text("SELECT title, authors.author, year, isbn FROM books JOIN \
+                 authors ON books.author_id = authors.id WHERE isbn = :isbn")
+    book = db.execute(query, {"isbn": isbn}).fetchone()
+    if book is None:
+        return "ERROR (404): ISBN not found\n"
+    else:
+        data = jsonify(title=book[0], author=book[1],
+                       year=book[2], isbn=book[3])
+        return data
