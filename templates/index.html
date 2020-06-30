@@ -1,49 +1,28 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% extends "layout.html" %}
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-
-    <title>Bluth Corp.</title>
-  </head>
-  <body>
-    <div class="container">
-    </div>
-    <div class="container">
-      <div class="jumbotron">
-        <h1>Search book</h1>
-        <hr class="my-4">
-        <form action="/search" method=post>
-          <div class="form-row">
-            <div class="form-group col-md-3">
-              <label for="searchby">Search by</label>
-              <select class="form-control" name="searchby" readonly>
-                <option selected>Book</option>
-                <option>Author</option>
-                <option>ISBN</option>
-              </select>
-            </div>
-            <div class="form-group col-md-9">
-              <input type="text" class="form-control" name="searchfor" placeholder="Book, author or ISBN...">
-            </div>
+{% block body %}
+  <div class="container">
+    <div class="jumbotron my-2">
+      <h1 class="logo">Gensfleisch</h1>
+      <hr class="my-4">
+      <form action="/search" method=post>
+        <div class="form-inline">
+          <div class="form-group">
+            <label class="my-1 mr-2" for="searchby">Search by</label>
+            <select class="custom-select my-1 mr-2" name="searchby">
+              <option selected>Book</option>
+              <option>Author</option>
+              <option>ISBN</option>
+            </select>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <button type="submit" class="btn btn-primary">Search</button>
-            </div>
+          <div class="form-group">
+            <input type="text" class="form-control my-1 mr-2" name="searchfor" placeholder="Search for...">
           </div>
-        </form>
-      </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary my-1">Search</button>
+          </div>
+        </div>
+      </form>
     </div>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-  </body>
-</html>
+  </div>
+{% endblock %}
