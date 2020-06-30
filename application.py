@@ -35,7 +35,7 @@ def index():
 def books(isbn):
     # Get book info from database
     query = text("SELECT isbn, title, authors.author, year FROM books JOIN \
-                 authors ON books.author = authors.author_id WHERE isbn = :isbn")  # noqa: E501
+                 authors ON books.author_id = authors.id WHERE isbn = :isbn")
     book = db.execute(query, {"isbn": isbn}).fetchall()
     title = book[0][1]
     author = book[0][2]
@@ -61,7 +61,7 @@ def search():
     except KeyError:
         return "An error has occurred"
     query = text(f"SELECT isbn, title, authors.author, year FROM books JOIN \
-                 authors ON books.author = authors.author_id WHERE LOWER \
+                 authors ON books.author_id = authors.id WHERE LOWER \
                  ({search_by}) LIKE :search_for")
     books = db.execute(query, {"search_for": search_for}).fetchall()
     return render_template("search.html", books=books)
