@@ -40,9 +40,9 @@ def books(isbn):
     # Get book info from database
     query = text("SELECT isbn, title, authors.author, year FROM books JOIN \
                  authors ON books.author_id = authors.id WHERE isbn = :isbn")
-    book = db.execute(query, {"isbn": isbn}).fetchall()
-    title = book[0][1]
-    author = book[0][2]
+    book = db.execute(query, {"isbn": isbn}).fetchone()
+    title = book[1]
+    author = book[2]
 
     # Get data from Goodreads API
     data = retrieve_data(isbn)
