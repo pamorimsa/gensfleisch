@@ -1,19 +1,23 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  <div class="container-fluid">
-    {% for isbn, title, author, year in books %}
-      <div class="card">
-        <h5 class="card-header">
-          <a href="{{ url_for('books', isbn=isbn) }}">
-            {{ title }}
-          </a>
-        </h5>
-        <div class="card-body">
-          <h5 class="card-title">{{ author }}, {{ year }}</h5>
-          <p class="card-text">{{ isbn }}</p>
+  {% if books %}
+    <div class="container-fluid">
+      {% for isbn, title, author, year in books %}
+        <div class="card">
+          <h5 class="card-header">
+            <a href="{{ url_for('books', isbn=isbn) }}">
+              {{ title }}
+            </a>
+          </h5>
+          <div class="card-body">
+            <h5 class="card-title">{{ author }}, {{ year }}</h5>
+            <p class="card-text">{{ isbn }}</p>
+          </div>
         </div>
-      </div>
-    {% endfor %}
-  </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No results for "{{ term }}" were found.</p>
+  {% endif %}
 {% endblock %}

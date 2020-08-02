@@ -60,7 +60,7 @@ def books(isbn):
 @app.route("/search", methods=["POST"])
 def search():
     search_keys = {"book": "title", "author": "authors.author", "isbn": "isbn"}
-    search_for = f"%{request.form.get('searchfor').lower()}%"
+    search_for = f"%{request.form.get('searchfor')}%".lower()
     search_by = request.form.get("searchby").lower()
     try:
         search_by = search_keys[search_by]
@@ -70,7 +70,12 @@ def search():
                  authors ON books.author_id = authors.id WHERE LOWER \
                  ({search_by}) LIKE :search_for")
     books = db.execute(query, {"search_for": search_for}).fetchall()
-    return render_template("search.html", books=books)
+    size = len(books)
+    if size == 0:
+        term = search_for.lstrip("%").rstrip("%")
+        return render_template("search.html", term=term)
+    else:
+        return render_template("search.html", books=books, size=size)
 
 
 @app.route("/api/<isbn>", methods=["GET"])
