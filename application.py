@@ -75,7 +75,7 @@ def search():
         term = search_for.lstrip("%").rstrip("%")
         return render_template("search.html", term=term)
     else:
-        return render_template("search.html", books=books, size=size)
+        return render_template("search.html", books=books)
 
 
 @app.route("/api/<isbn>", methods=["GET"])
