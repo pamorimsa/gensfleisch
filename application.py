@@ -1,15 +1,17 @@
 import os
 
+from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from flask_session import Session
+from flask_bcrypt import Bcrypt
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
-from dotenv import load_dotenv
 
 # Import api request module
 from goodreads_api import retrieve_data
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 # Load dotenv
 load_dotenv('.env')
@@ -70,12 +72,30 @@ def search():
                  authors ON books.author_id = authors.id WHERE LOWER \
                  ({search_by}) LIKE :search_for")
     books = db.execute(query, {"search_for": search_for}).fetchall()
-    size = len(books)
-    if size == 0:
+    if books:
+        return render_template("search.html", books=books)
+    else:
         term = search_for.lstrip("%").rstrip("%")
         return render_template("search.html", term=term)
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if db.execute("SELECT * FROM users WHERE LOWER (username) = :username",
+                      {"username": username.lower()}).rowcount == 0:
+            query = text("INSERT INTO users (username, password)\
+                     VALUES (:username, :password)")
+            db.execute(query, {"username": username, "password": password})
+            db.commit()
+            return render_template("index.html")
+        else:
+            return render_template("register.html", feedback=True,
+                                   username=username)
     else:
-        return render_template("search.html", books=books)
+        return render_template("register.html")
 
 
 @app.route("/api/<isbn>", methods=["GET"])
