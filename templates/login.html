@@ -1,4 +1,31 @@
 {% extends "layout.html" %}
 
 {% block body %}
+  <div class="jumbotron my-2">
+    <div class="container">
+      <form action"{{ url_for ('login') }}" method="post">
+        <div class="form-group">
+          <label for="username">User</label>
+          {% if user_error %}
+            <input type="text" class="form-control is-invalid" name="username" value="{{ username }}" required>
+            <div class="invalid-feedback">User not found</div>
+          {% elif password_error %}
+            <input type="text" class="form-control" name="username" value="{{ username }}" required>
+          {% else %}
+            <input type="text" class="form-control" name="username" required>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          {% if password_error %}
+            <input type="password" class="form-control is-invalid" name="password" required>
+            <div class="invalid-feedback">Incorrect password</div>
+          {% else %}
+            <input type="password" class="form-control" name="password" required>
+          {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
 {% endblock %}

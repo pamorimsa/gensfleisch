@@ -86,9 +86,10 @@ def register():
         password = request.form.get("password")
         if db.execute("SELECT * FROM users WHERE LOWER (username) = :username",
                       {"username": username.lower()}).rowcount == 0:
+            pw_hash = bcrypt.generate_password_hash(password).decode("utf-8")
             query = text("INSERT INTO users (username, password)\
                      VALUES (:username, :password)")
-            db.execute(query, {"username": username, "password": password})
+            db.execute(query, {"username": username, "password": pw_hash})
             db.commit()
             return render_template("index.html")
         else:
@@ -96,6 +97,28 @@ def register():
                                    username=username)
     else:
         return render_template("register.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        candidate = request.form.get("password")
+        if db.execute("SELECT * FROM users WHERE LOWER (username) = :username",
+                      {"username": username.lower()}).rowcount == 0:
+            return render_template("login.html", user_error=True,
+                                   username=username)
+        else:
+            pw_hash = db.execute("SELECT password FROM users WHERE username = \
+                                 :username", {"username": username}).fetchone()
+            pw_hash = pw_hash[0]
+            if bcrypt.check_password_hash(pw_hash, candidate):
+                return render_template("index.html")
+            else:
+                return render_template("login.html", password_error=True,
+                                       username=username)
+    else:
+        return render_template("login.html")
 
 
 @app.route("/api/<isbn>", methods=["GET"])
